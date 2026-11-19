@@ -1,0 +1,13 @@
+{
+  "name": "ARFunctionLab.Editor",
+  "references": [
+    "ARFunctionLab",
+    "Unity.TextMeshPro",
+    "Unity.XR.Management",
+    "Unity.XR.Management.Editor",
+    "Unity.XR.OpenXR",
+    "Unity.XR.OpenXR.Editor",
+    "Unity.RenderPipelines.Universal.Runtime"
+  ],
+  "includePlatforms": ["Editor"]
+}

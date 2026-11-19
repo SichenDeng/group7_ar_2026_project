@@ -1,0 +1,12 @@
+{
+  "name": "ARFunctionLab",
+  "rootNamespace": "ARFunctionLab",
+  "references": [
+    "Unity.TextMeshPro",
+    "UnityEngine.UI",
+    "Unity.InputSystem",
+    "Unity.XR.CoreUtils",
+    "Unity.XR.Interaction.Toolkit",
+    "Unity.XR.ARFoundation"
+  ]
+}
