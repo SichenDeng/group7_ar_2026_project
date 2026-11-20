@@ -1,0 +1,13 @@
+{
+  "name": "ARFunctionLab.EditModeTests",
+  "rootNamespace": "ARFunctionLab.Tests",
+  "references": [
+    "ARFunctionLab"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
