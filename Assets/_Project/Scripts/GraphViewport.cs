@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ARFunctionLab
@@ -7,25 +8,44 @@ namespace ARFunctionLab
         private Camera view;
         private SurfacePlotter plotter;
         private GraphDisplay display;
+        private CrossSectionDisplay crossSection;
         private Transform content;
         private bool quest;
         private int screenWidth, screenHeight;
         public RectTransform Sidebar;
         public RectTransform Controls;
 
-        public void Initialize(Camera camera, SurfacePlotter target, GraphDisplay grid, Transform graphContent, bool isQuest)
+        public void Initialize(Camera camera, SurfacePlotter target, GraphDisplay grid, CrossSectionDisplay cut, Transform graphContent, bool isQuest)
         {
             view = camera;
             plotter = target;
             display = grid;
+            crossSection = cut;
             content = graphContent;
             quest = isQuest;
             plotter.SurfaceChanged += Refresh;
+            plotter.CrossSectionChanged += RefreshCrossSection;
+        }
+
+        /// <summary>Rebuilds only the cutting plane, leaving the mesh and camera fit untouched.</summary>
+        private void RefreshCrossSection()
+        {
+            if (crossSection == null || plotter.LastResult == null) return;
+            Dictionary<string, double> parameters;
+            string message;
+            if (!plotter.settings.TryGetParameters(out parameters, out message)) return;
+            crossSection.Build(
+                plotter.CurrentFormula,
+                plotter.settings,
+                parameters,
+                plotter.crossSection,
+                plotter.LastResult.Mesh.bounds);
         }
 
         private void Refresh()
         {
             display.Build(plotter.settings, plotter.LastResult.Mesh.bounds);
+            RefreshCrossSection();
             content.localPosition = -display.LocalBounds.center;
             if (quest)
             {
@@ -92,7 +112,9 @@ namespace ARFunctionLab
 
         private void OnDestroy()
         {
-            if (plotter != null) plotter.SurfaceChanged -= Refresh;
+            if (plotter == null) return;
+            plotter.SurfaceChanged -= Refresh;
+            plotter.CrossSectionChanged -= RefreshCrossSection;
         }
     }
 }
