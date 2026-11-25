@@ -53,8 +53,10 @@ namespace ARFunctionLab
             surface.GetComponent<MeshRenderer>().sharedMaterial = surfaceMaterial;
             GraphDisplay display = content.AddComponent<GraphDisplay>();
             display.lineMaterial = lineMaterial;
+            CrossSectionDisplay crossSection = content.AddComponent<CrossSectionDisplay>();
+            crossSection.lineMaterial = lineMaterial;
             GraphViewport viewport = graph.AddComponent<GraphViewport>();
-            viewport.Initialize(camera, plotter, display, content.transform, quest);
+            viewport.Initialize(camera, plotter, display, crossSection, content.transform, quest);
             GameObject events = new GameObject("EventSystem", typeof(EventSystem));
             if (quest) events.AddComponent<XRUIInputModule>();
             else events.AddComponent<InputSystemUIInputModule>();
@@ -82,6 +84,7 @@ namespace ARFunctionLab
             RectTransform panel = UIFactory.Rect("Formula Input", canvasObject.transform, 28, 26, 704, 844);
             InputUI = panel.gameObject.AddComponent<FormulaInputUI>();
             InputUI.plotter = plotter;
+            InputUI.crossSection = crossSection;
             InputUI.graphRoot = graph.transform;
             viewport.Sidebar = panel;
             InputUI.Build();

@@ -1,5 +1,11 @@
 Shader "AR Function Lab/Line"
 {
+    Properties
+    {
+        // Default 4 is LEqual, so existing line materials keep their current behaviour.
+        // The cross-section curve overrides this to Always so it is not hidden by the surface.
+        [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("Depth Test", Float) = 4
+    }
     SubShader
     {
         Tags { "RenderType"="Transparent" "Queue"="Transparent" "RenderPipeline"="UniversalPipeline" }
@@ -7,6 +13,7 @@ Shader "AR Function Lab/Line"
         {
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
+            ZTest [_ZTest]
             Cull Off
             HLSLPROGRAM
             #pragma vertex Vert

@@ -7,9 +7,12 @@ namespace ARFunctionLab
     public class SurfacePlotter : MonoBehaviour
     {
         public SurfaceSettings settings = new SurfaceSettings();
+        public CrossSectionSettings crossSection = new CrossSectionSettings();
         public ParsedFormula CurrentFormula { get; private set; }
         public SurfaceResult LastResult { get; private set; }
         public event System.Action SurfaceChanged;
+        /// <summary>Raised when only the cutting plane moved, so the mesh is not regenerated.</summary>
+        public event System.Action CrossSectionChanged;
         private Mesh ownedMesh;
 
         public bool TryPlot(string source, out string message)
@@ -78,12 +81,58 @@ namespace ARFunctionLab
             CurrentFormula = formula;
             LastResult = result;
             settings = candidate;
+            // A new domain can leave the cutting plane outside the plotted area.
+            crossSection.ClampToDomain(settings);
             Release(oldMesh);
             message = result.Mesh.vertexCount.ToString("N0") + " vertices  |  " + result.Triangles.ToString("N0") + " triangles  |  " + result.Milliseconds.ToString("F1") + " ms";
             if (result.UndefinedSamples > 0 || result.ExcludedSamples > 0)
                 message += "\nSkipped: " + result.UndefinedSamples + " undefined, " + result.ExcludedSamples + " outside height limit.";
             if (SurfaceChanged != null) SurfaceChanged();
             return true;
+        }
+
+        public void ToggleCrossSection()
+        {
+            crossSection.enabled = !crossSection.enabled;
+            if (crossSection.enabled) crossSection.ClampToDomain(settings);
+            RaiseCrossSectionChanged();
+        }
+
+        public void SetCrossSectionAxis(CrossSectionAxis axis)
+        {
+            if (crossSection.axis == axis) return;
+            crossSection.axis = axis;
+            crossSection.ClampToDomain(settings);
+            RaiseCrossSectionChanged();
+        }
+
+        /// <summary>Moves the plane by one grid tick, reusing the axis step the grid already draws.</summary>
+        public void StepCrossSection(int direction)
+        {
+            double min;
+            double max;
+            CrossSectionSettings.GetFixedRange(settings, crossSection.axis, out min, out max);
+            double step = GraphDisplay.TickStep(max - min);
+            if (step <= 0 || !FunctionCatalog.IsFinite(step)) return;
+            double ticks = crossSection.value / step;
+            double rounded = System.Math.Round(ticks);
+            // From an off-grid value the first press snaps onto the grid in that direction.
+            double next = System.Math.Abs(ticks - rounded) > 1e-6
+                ? (direction > 0 ? System.Math.Ceiling(ticks) : System.Math.Floor(ticks)) * step
+                : (rounded + direction) * step;
+            SetCrossSectionValue(next);
+        }
+
+        public void SetCrossSectionValue(double value)
+        {
+            crossSection.value = value;
+            crossSection.ClampToDomain(settings);
+            RaiseCrossSectionChanged();
+        }
+
+        private void RaiseCrossSectionChanged()
+        {
+            if (CrossSectionChanged != null) CrossSectionChanged();
         }
 
         private void Release(Mesh mesh)

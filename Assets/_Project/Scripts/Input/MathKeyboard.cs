@@ -11,6 +11,11 @@ namespace ARFunctionLab
         private Action generate;
         private RectTransform keys;
         private readonly Button[] tabs = new Button[3];
+        /// <summary>
+        /// Optional hook that can consume a key before the formula editor sees it, so another
+        /// field on the panel can borrow the keyboard. Return true when the key was handled.
+        /// </summary>
+        public Func<string, bool> Intercept;
 
         public void Initialize(FormulaEditor model, Action submit)
         {
@@ -118,6 +123,7 @@ namespace ARFunctionLab
 
         public void Press(string command)
         {
+            if (Intercept != null && Intercept(command)) return;
             switch (command)
             {
                 case "left": editor.Move(-1); return;
