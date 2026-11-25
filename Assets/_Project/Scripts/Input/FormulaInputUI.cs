@@ -67,6 +67,8 @@ namespace ARFunctionLab
             Keyboard.Intercept = HandleCutKey;
             BuildMenu();
             Editor.ContentChanged += OnDraftChanged;
+            // Dragging the plane changes the value without going through this panel.
+            plotter.CrossSectionChanged += OnCrossSectionChanged;
             Editor.LoadPreset(0);
             Generate();
         }
@@ -316,9 +318,16 @@ namespace ARFunctionLab
             RefreshPlotState();
         }
 
+        private void OnCrossSectionChanged()
+        {
+            RefreshCutRow();
+            RefreshStatus();
+        }
+
         private void OnDestroy()
         {
             if (Editor != null) Editor.ContentChanged -= OnDraftChanged;
+            if (plotter != null) plotter.CrossSectionChanged -= OnCrossSectionChanged;
         }
     }
 }

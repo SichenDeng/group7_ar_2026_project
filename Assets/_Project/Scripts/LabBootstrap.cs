@@ -57,6 +57,12 @@ namespace ARFunctionLab
             crossSection.lineMaterial = lineMaterial;
             GraphViewport viewport = graph.AddComponent<GraphViewport>();
             viewport.Initialize(camera, plotter, display, crossSection, content.transform, quest);
+            CrossSectionInteractor dragger = graph.AddComponent<CrossSectionInteractor>();
+            dragger.plotter = plotter;
+            dragger.display = crossSection;
+            dragger.graphContent = content.transform;
+            dragger.viewCamera = camera;
+            dragger.quest = quest;
             GameObject events = new GameObject("EventSystem", typeof(EventSystem));
             if (quest) events.AddComponent<XRUIInputModule>();
             else events.AddComponent<InputSystemUIInputModule>();
