@@ -85,6 +85,14 @@ namespace ARFunctionLab
             ray.interactionManager = manager;
             ray.enableUIInteraction = true;
             ray.maxRaycastDistance = 6;
+
+            // UI presses and 3D selections are separate inputs in XRI. The trigger was already
+            // wired to UI, but the cutting-plane interactable also needs the select input.
+            ray.selectInput = new XRInputButtonReader();
+            ray.selectInput.inputSourceMode = XRInputButtonReader.InputSourceMode.InputAction;
+            ray.selectInput.inputActionPerformed = new InputAction(hand + " Select", InputActionType.Button, device + "/triggerPressed");
+            ray.selectInput.inputActionValue = new InputAction(hand + " Select Value", InputActionType.Value, device + "/trigger");
+
             ray.uiPressInput = new XRInputButtonReader();
             ray.uiPressInput.inputSourceMode = XRInputButtonReader.InputSourceMode.InputAction;
             ray.uiPressInput.inputActionPerformed = new InputAction(hand + " UI Press", InputActionType.Button, device + "/triggerPressed");
